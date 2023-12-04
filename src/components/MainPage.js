@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { getToken } from './TokenService';
-import { generateUrl } from './ApiService';
+import { generateUrl } from './UrlService';
 import './MainPage.css';
 
 const MainPage = () => {
@@ -17,6 +17,10 @@ const MainPage = () => {
   const toggleModal = () => setModal(!modal);
 
   const generarTokenYURL = async () => {
+    setTokenResult('');
+    setUrlResult('');
+    setErrorResult('');
+
     // Validar los campos
     if (!monto || !referencia1) {
       setErrorResult('Por favor, complete el monto y la referencia 1.');
@@ -25,7 +29,7 @@ const MainPage = () => {
 
     try {
       // Paso 3 - Generar Token
-      const token = await getToken(process.env.REACT_APP_API_USERNAME, process.env.REACT_APP_API_PASSWORD);
+      const token = await getToken();
       setTokenResult('Token generado exitosamente.');
 
       // Paso 4 - Invocar API para conexion con Banca Xpress
@@ -35,9 +39,9 @@ const MainPage = () => {
         referencia2,
         referencia3,
       });
-
-      setUrlResult(`URL generada: ${url}`);
-      toggleModal(); // Abre el modal despues de obtener la URL
+      setUrlResult(url);
+      toggleModal(); // Abre el modal después de obtener la URL
+      window.open(url, '_blank'); // Abre la URL en una nueva pestaña
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setErrorResult(`Error ${error.response.status}: ${error.response.data.message}`);
@@ -61,7 +65,7 @@ const MainPage = () => {
                 className="form-control"
                 id="monto"
                 value={monto}
-                onChange={(e) => setMonto(e.target.value)}
+                onChange={(e) => setMonto(parseInt(e.target.value, 10))}
                 required
               />
             </FormGroup>

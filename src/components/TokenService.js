@@ -10,7 +10,14 @@ const getToken = async () => {
       username: USERNAME,
       password: PASSWORD,
     });
-    return response.data.IdToken;
+
+    if (response.status === 200 && response.data && response.data.data) {
+      const token = response.data.data.IdToken;
+      console.log('token:', token);
+      return token;
+    } else {
+      throw new Error('Error al obtener el token.');
+    }
   } catch (error) {
     throw error;
   }
