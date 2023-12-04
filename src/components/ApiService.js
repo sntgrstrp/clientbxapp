@@ -13,4 +13,4 @@ const generateUrl = async (token, requestData) => {
   }
 };
 
-export default { generateUrl };
+export { generateUrl };

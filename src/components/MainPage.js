@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import TokenService from './TokenService';
-import ApiService from './ApiService';
+import { getToken } from './TokenService';
+import { generateUrl } from './ApiService';
 import './MainPage.css';
 
 const MainPage = () => {
@@ -25,11 +25,11 @@ const MainPage = () => {
 
     try {
       // Paso 3 - Generar Token
-      const token = await TokenService.getToken('usuario_del_correo', 'clave_del_correo');
+      const token = await getToken(process.env.REACT_APP_API_USERNAME, process.env.REACT_APP_API_PASSWORD);
       setTokenResult('Token generado exitosamente.');
 
       // Paso 4 - Invocar API para conexion con Banca Xpress
-      const url = await ApiService.generateUrl(token, {
+      const url = await generateUrl(token, {
         monto,
         referencia1,
         referencia2,
