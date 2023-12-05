@@ -15,6 +15,9 @@ const MainPage = () => {
   const [errorResult, setErrorResult] = useState('');
   const [buttonClicked, setButtonClicked] = useState(false);
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -26,14 +29,14 @@ const MainPage = () => {
     setButtonClicked(true);
 
     // Validar los campos
-    if (!monto || !referencia1) {
-      setErrorResult('Por favor, complete el monto y la referencia 1.');
+    if (!monto || !referencia1 || !username || !password) {
+      setErrorResult('Por favor, complete todos los campos.');
       return;
     }
 
     try {
       // Paso 3 - Generar Token
-      const token = await getToken();
+      const token = await getToken(username, password);
       setTokenResult('Token generado exitosamente.');
 
       // Paso 4 - Invocar API para conexion con Banca Xpress
@@ -48,7 +51,12 @@ const MainPage = () => {
       window.open(url, '_blank'); // Abre la URL en una nueva pestaña
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        setErrorResult(`Error ${error.response.status}: ${error.response.data.message}`);
+        const responseData = error.response.data;
+        if (responseData.data && responseData.data.includes('UserNotFoundException')) {
+          setErrorResult('Error: El usuario no existe.');
+        } else {
+          setErrorResult(`Error ${error.response.status}: ${responseData.message}`);
+        }
       } else {
         setErrorResult('Error al invocar la API para conexión con Banca Xpress.');
       }
@@ -63,7 +71,31 @@ const MainPage = () => {
 
           <Form>
             <FormGroup className="mb-3 col-lg-6-3">
-              <Label for="monto">Monto:</Label>
+              <Label for="username">Usuario</Label>
+              <Input
+                type="text"
+                className="form-control"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </FormGroup>
+
+            <FormGroup className="mb-3 col-lg-6-3">
+              <Label for="password">Contraseña</Label>
+              <Input
+                type="password"
+                className="form-control"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </FormGroup>
+
+            <FormGroup className="mb-3 col-lg-6-3">
+              <Label for="monto">Monto</Label>
               <Input
                 type="number"
                 className="form-control"
@@ -75,7 +107,7 @@ const MainPage = () => {
             </FormGroup>
 
             <FormGroup className="mb-3 col-lg-6-3">
-              <Label for="referencia1">Referencia 1:</Label>
+              <Label for="referencia1">Referencia 1</Label>
               <Input
                 type="text"
                 className="form-control"
@@ -87,7 +119,7 @@ const MainPage = () => {
             </FormGroup>
 
             <FormGroup className="mb-3 col-lg-6-3">
-              <Label for="referencia2">Referencia 2:</Label>
+              <Label for="referencia2">Referencia 2</Label>
               <Input
                 type="text"
                 className="form-control"
@@ -98,7 +130,7 @@ const MainPage = () => {
             </FormGroup>
 
             <FormGroup className="mb-3 col-lg-6-3">
-              <Label for="referencia3">Referencia 3:</Label>
+              <Label for="referencia3">Referencia 3</Label>
               <Input
                 type="text"
                 className="form-control"
