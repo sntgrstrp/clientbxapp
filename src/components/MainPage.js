@@ -13,13 +13,17 @@ const MainPage = () => {
   const [urlResult, setUrlResult] = useState('');
   const [modal, setModal] = useState(false);
   const [errorResult, setErrorResult] = useState('');
+  const [buttonClicked, setButtonClicked] = useState(false);
 
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => {
+    setModal(!modal);
+  };
 
   const generarTokenYURL = async () => {
     setTokenResult('');
     setUrlResult('');
     setErrorResult('');
+    setButtonClicked(true);
 
     // Validar los campos
     if (!monto || !referencia1) {
@@ -40,7 +44,7 @@ const MainPage = () => {
         referencia3,
       });
       setUrlResult(url);
-      toggleModal(); // Abre el modal después de obtener la URL
+      toggleModal(); // Abre el modal despues de obtener la URL
       window.open(url, '_blank'); // Abre la URL en una nueva pestaña
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -105,16 +109,20 @@ const MainPage = () => {
             </FormGroup>
 
             <Button type="button" color="primary" onClick={generarTokenYURL}>
-              Generar Token y URL
+              Solicitar crédito
             </Button>
           </Form>
 
           {/* Resultados y mensajes de error */}
           <div className="mt-4">
-            <h2>Resultados</h2>
-            {tokenResult && <div className="alert alert-success">{tokenResult}</div>}
-            {urlResult && <div className="alert alert-info">{urlResult}</div>}
-            {errorResult && <div className="alert alert-danger">{errorResult}</div>}
+            {buttonClicked && (
+              <>
+                <h2>Resultados</h2>
+                {tokenResult && <div className="alert alert-success">{tokenResult}</div>}
+                {urlResult && <div className="alert alert-info">{urlResult}</div>}
+                {errorResult && <div className="alert alert-danger">{errorResult}</div>}
+              </>
+            )}
           </div>
         </div>
       </section>
